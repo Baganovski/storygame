@@ -25,7 +25,7 @@ let resetConfirmed = false; // Flag for reset confirmation
 
 beginStoryButton.addEventListener("click", beginStory);
 nextButton.addEventListener("click", nextTurn);
-resetButton.addEventListener("click", handleResetClick); // Use a handler function
+resetButton.addEventListener("click", handleResetClick);
 endStoryButton.addEventListener("click", endGame);
 backButton.addEventListener("click", goBack);
 storyInput.addEventListener("input", updateCharacterCount);
@@ -34,9 +34,9 @@ function beginStory() {
   titleScreenDiv.classList.add("hidden");
   gameDiv.classList.remove("hidden");
   endStoryButton.style.display = "inline-block";
-  resetButton.style.display = "none"; // Initially hide reset button
-  resetButton.textContent = "Reset"; // Ensure correct initial text
-  resetConfirmed = false; // Reset confirmation flag
+  resetButton.style.display = "none";
+  resetButton.textContent = "Reset";
+  resetConfirmed = false;
   storyInput.focus();
 }
 
@@ -59,17 +59,17 @@ function nextTurn() {
   const inputText = storyInput.value.trim();
 
   if (!inputText.endsWith(".")) {
-    fullStopError.classList.remove("hidden"); // Show error
-    return; // Stop if no full stop
+    fullStopError.classList.remove("hidden");
+    return;
   }
-  fullStopError.classList.add("hidden"); // Hide error if present
+  fullStopError.classList.add("hidden");
 
   if (inputText === "") {
     return;
   }
 
   storySegments.push(inputText);
-  story += inputText + " "; // Add the space here
+  story += inputText + " "; // Keep adding the space here
   extractAndAddNouns(inputText);
   updateComponentsDisplay();
   storyInput.value = "";
@@ -85,7 +85,7 @@ function nextTurn() {
 function goBack() {
   if (storySegments.length > 0) {
     const lastSegment = storySegments.pop();
-    story = story.substring(0, story.length - lastSegment.length - 1); //remove last segment
+    story = story.substring(0, story.length - lastSegment.length - 1);
     removeNounsFromSegment(lastSegment);
     updateComponentsDisplay();
     storyInput.value = lastSegment;
@@ -103,18 +103,17 @@ function goBack() {
 function removeNounsFromSegment(segment) {
   const words = segment.split(/\s+/);
   for (const word of words) {
-    const cleanedWord = word.replace(/[^a-zA-Z]/g, "").toLowerCase();
+    const cleanedWord = cleanWord(word);
     const index = storyNouns.indexOf(cleanedWord);
     if (index > -1) {
       storyNouns.splice(index, 1);
     }
-    // Decrement word frequency
     if (wordFrequencies[cleanedWord] > 0) {
       wordFrequencies[cleanedWord]--;
     }
   }
 }
-// --- Heuristic Noun Extraction ---
+
 function extractAndAddNouns(text) {
   const words = text.split(/\s+/);
   const indicators = [
@@ -160,7 +159,7 @@ function extractAndAddNouns(text) {
     "ourselves",
     "yourselves",
     "themselves",
-  ]; //Pronouns
+  ];
   const adpositions = [
     "above",
     "across",
@@ -220,23 +219,16 @@ function extractAndAddNouns(text) {
   ];
 
   for (let i = 0; i < words.length; i++) {
-    let word = words[i].replace(/[^a-zA-Z]/g, "").toLowerCase();
+    let word = cleanWord(words[i]);
 
     if (word.length > 3 && !isCommonWord(word) && !pronouns.includes(word)) {
-      // Check if preceded by an indicator
-      if (
-        i > 0 &&
-        indicators.includes(
-          words[i - 1].replace(/[^a-zA-Z]/g, "").toLowerCase()
-        )
-      ) {
+      if (i > 0 && indicators.includes(cleanWord(words[i - 1]))) {
         addNoun(word);
-        continue; // Move to the next word
+        continue;
       }
 
-      //Check for noun followed by noun (prioritize the second)
       if (i < words.length - 1) {
-        let nextWord = words[i + 1].replace(/[^a-zA-Z]/g, "").toLowerCase();
+        let nextWord = cleanWord(words[i + 1]);
         if (
           word.length > 3 &&
           !isCommonWord(nextWord) &&
@@ -244,25 +236,21 @@ function extractAndAddNouns(text) {
           !adpositions.includes(nextWord)
         ) {
           addNoun(nextWord);
-          i++; //Skip the next word as it has been added.
+          i++;
           continue;
         }
       }
 
-      // Check if followed by "of" or "with" (common with descriptive nouns)
       if (
         i < words.length - 2 &&
-        adpositions.includes(
-          words[i + 1].replace(/[^a-zA-Z]/g, "").toLowerCase()
-        )
+        adpositions.includes(cleanWord(words[i + 1]))
       ) {
         addNoun(word);
         continue;
       }
-      // Check if followed by a verb (less reliable, but can help)
+
       if (i < words.length - 1) {
-        let nextWord = words[i + 1].replace(/[^a-zA-Z]/g, "").toLowerCase();
-        //VERY basic verb check.
+        let nextWord = cleanWord(words[i + 1]);
         if (
           nextWord.endsWith("ing") ||
           nextWord.endsWith("ed") ||
@@ -280,7 +268,6 @@ function addNoun(word) {
   if (!storyNouns.includes(word)) {
     storyNouns.push(word);
   }
-  // Increment word frequency
   wordFrequencies[word] = (wordFrequencies[word] || 0) + 1;
 }
 
@@ -403,8 +390,8 @@ function updateComponentsDisplay() {
 }
 
 function endGame() {
-  story += storyInput.value; //removed extra space
-  extractAndAddNouns(storyInput.value);
+  story += storyInput.value + " "; // Add the final input, PLUS A SPACE
+  extractAndAddNouns(story); // Extract nouns from the ENTIRE story
   updateComponentsDisplay();
 
   gameDiv.classList.add("hidden");
@@ -413,16 +400,44 @@ function endGame() {
   resetButton.style.display = "inline-block";
   resetButton.textContent = "Reset";
   resetConfirmed = false;
-  resultStory.textContent = story;
+
+  resultStory.textContent = capitalizeStory(story);
   theEnd.style.display = "block";
 }
 
+function capitalizeStory(text) {
+  if (!text) {
+    return "";
+  }
+
+  let result = "";
+  let capitalizeNext = true;
+
+  for (let i = 0; i < text.length; i++) {
+    let currentChar = text[i];
+
+    if (capitalizeNext && /[a-zA-Z]/.test(currentChar)) {
+      // KEY CHANGE: Only capitalize if it's a letter
+      currentChar = currentChar.toUpperCase();
+      capitalizeNext = false;
+    } else if (text[i] === "." || text[i] === "?" || text[i] === "!") {
+      // Set capitalizeNext for after punctuation
+      capitalizeNext = true;
+    }
+
+    result += currentChar;
+  }
+
+  result = result.replace(/\bi\b/g, "I");
+  return result.trimEnd();
+}
+
 function handleResetClick() {
-  if (resetConfirmed) {
-    resetGame();
-  } else {
+  if (!resetConfirmed) {
     resetButton.textContent = "Are you sure?";
     resetConfirmed = true;
+  } else {
+    resetGame();
   }
 }
 
@@ -445,4 +460,8 @@ function resetGame() {
   endStoryButton.style.display = "none";
   resetButton.style.display = "none";
   resetConfirmed = false;
+}
+
+function cleanWord(word) {
+  return word.replace(/[^a-zA-Z]/g, "").toLowerCase();
 }
