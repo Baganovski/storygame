@@ -97,7 +97,7 @@ body {
   border-color: #d99696;
   font-weight: bold;
   position: absolute;
-  bottom: 20px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -108,14 +108,14 @@ body {
   font-weight: bold;
   white-space: nowrap;
   position: absolute;
-  bottom: 20px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 #result {
   overflow-y: auto;
-  max-height: 580px;
+  max-height: 500px;
   padding-bottom: 60px;
 }
 #game {
