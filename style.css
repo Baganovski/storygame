@@ -115,7 +115,7 @@ body {
 
 #result {
   overflow-y: auto;
-  max-height: 70vh;
+  max-height: 65vh;
   padding-bottom: 60px;
 }
 #game {
