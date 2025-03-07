@@ -86,12 +86,6 @@ The noun extraction works by examining each word in the input and applying these
 *   **`cleanWord(word)`:**  Removes non-alphabetic characters and converts a word to lowercase.
 *   **`isCommonWord(word)`:**  Checks if a word is in the list of common words.
 
-## Running the App
-
-*  Go to https://baganovski.github.io/thestorygame/ or
-*  Save the `index.html`, `style.css`, and `script.js` files in the same directory.
-*  Open `index.html` in a web browser.
-
 ## Limitations
 
 *   **Noun Extraction Accuracy:** As mentioned above, the noun extraction is heuristic and not perfectly accurate.
