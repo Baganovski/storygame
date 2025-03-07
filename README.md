@@ -88,8 +88,9 @@ The noun extraction works by examining each word in the input and applying these
 
 ## Running the App
 
-1.  Save the `index.html`, `style.css`, and `script.js` files in the same directory.
-2.  Open `index.html` in a web browser.
+*  Go to https://baganovski.github.io/thestorygame/ or
+*  Save the `index.html`, `style.css`, and `script.js` files in the same directory.
+*  Open `index.html` in a web browser.
 
 ## Limitations
 
